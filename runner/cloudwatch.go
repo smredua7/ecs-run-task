@@ -150,6 +150,7 @@ func (lw *logWatcher) Watch(ctx context.Context) error {
 	}
 
 	if err := waiter.Wait(ctx); err != nil {
+		fmt.Printf("error from wait in watch: %v ", err)
 		return err
 	}
 
@@ -165,6 +166,7 @@ func (lw *logWatcher) Watch(ctx context.Context) error {
 		select {
 		case <-time.After(pollInterval):
 			if after, err = lw.printEventsAfter(ctx, after); err != nil {
+				fmt.Printf("error from timeAfter in watch: %v", err)
 				return err
 			}
 
@@ -172,6 +174,7 @@ func (lw *logWatcher) Watch(ctx context.Context) error {
 			return nil
 
 		case <-ctx.Done():
+			fmt.Printf("error from ctxDone in watch: %v", ctx.Err())
 			return ctx.Err()
 		}
 	}
@@ -216,6 +219,7 @@ func (lw *logWatcher) printEventsAfter(ctx context.Context, ts int64) (int64, er
 		})
 	if err != nil {
 		log.Printf("Printed %d events in %v", count, time.Now().Sub(t))
+		fmt.Printf("error from filterLogEvents: %v", err)
 	}
 
 	return ts, err
@@ -260,11 +264,13 @@ func (lw *logWriter) WriteString(ctx context.Context, msg string) error {
 	}
 
 	if err := waiter.Wait(ctx); err != nil {
+		fmt.Printf("error from wai in WriteString: %v", err)
 		return err
 	}
 
 	sequence, err := lw.nextSequenceToken()
 	if err != nil {
+		fmt.Printf("error from nextSequenceToken in WriteString: %v", err)
 		return err
 	}
 
@@ -280,6 +286,9 @@ func (lw *logWriter) WriteString(ctx context.Context, msg string) error {
 			},
 		},
 	})
+	if err != nil {
+		fmt.Printf("error from putLogEvents: %v ", err)
+	}
 	return err
 }
 
