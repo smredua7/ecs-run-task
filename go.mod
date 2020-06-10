@@ -1,4 +1,4 @@
-module github.com/smredua7/ecs-run-task
+module github.com/buildkite/ecs-run-task
 
 go 1.13
 
